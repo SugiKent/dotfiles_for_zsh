@@ -23,7 +23,8 @@ autoload colors
 colors
 
 # プロンプト
-PROMPT="%{${fg[green]}%}%n@%m %{${fg[yellow]}%}%~ %{${fg[red]}%}%# %{${reset_color}%}"
+PROMPT="%{${fg[green]}%}%~%{${reset_color}%}
+[%n]$ "
 PROMPT2="%{${fg[yellow]}%} %_ > %{${reset_color}%}"
 SPROMPT="%{${fg[red]}%}correct: %R -> %r ? [n,y,a,e] %{${reset_color}%}"
 
@@ -57,33 +58,37 @@ setopt auto_pushd
 # # ディレクトリ名を入力するだけでcdできるようにする
 setopt auto_cd
 
+# cd後にll
+function chpwd() { ls -lha }
+
 # iTerm2のタブ名を変更する
 function title {
      echo -ne "\033]0;"$*"\007"
      }
 
 #カレントディレクトリを表示
-PS1="${HOST%%.*} %1~%(!.#.$) "
+#PS1="${HOST%%.*} %1~%(!.#.$) "
 
 #コマンドの候補を表示
 setopt correct
 
 #エイリアス
-alias ll='ls -la'
+alias ll='ls -lah'
 alias status='git status'
 alias add='git add'
 alias commit='git commit -m'
 alias fetch='git fetch'
-alias checkout='git checkout'
+alias co='git checkout'
 alias gpull='git pull'
 alias diff='git diff'
 alias b='bundle exec'
+alias v='vagrant'
 merge_master()
 {
   git fetch && git checkout master && git pull origin master && git checkout "$1" && git merge master
 }
 alias merge_master_this_branch='merge_master `git rev-parse --abbrev-ref HEAD`'
-alias new_branch='fetch && checkout master && gpull master && checkout -b'
+alias new_branch='fetch && co master && gpull master && co -b'
 alias gpull='git pull origin `git rev-parse --abbrev-ref HEAD`'
 alias gpush='git push origin `git rev-parse --abbrev-ref HEAD`'
 alias mysql_to_hikakaku_wp_production="mysql -uhikakaku -hhikakaku.com -p hikakaku_wp"
@@ -91,6 +96,10 @@ alias mysql_to_hikakaku_wp_production="mysql -uhikakaku -hhikakaku.com -p hikaka
 HISTFILE=~/.zsh_history
 HISTSIZE=1000000
 SAVEHIST=1000000
+
+alias b='bundle exec'
+alias brs='bundle exec rails s'
+alias brc='bundle exec rails c'
 
 # 同時に起動したzshの間でヒストリを共有する
 setopt share_history
@@ -114,3 +123,21 @@ RPROMPT=$RPROMPT'${vcs_info_msg_0_}'
 #export PATH="$HOME/.rbenv/shims:$HOME/.rbenv/bin:$PATH"
 export RBENV_ROOT=/usr/local/var/rbenv
 eval "$(rbenv init -)"
+export PATH=$HOME/.nodebrew/current/bin:$PATH
+export PATH="$HOME/.yarn/bin:$PATH"
+
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
+# Anaconda
+export PATH="$PYENV_ROOT/versions/anaconda2-4.4.0/bin/:$PATH"
+
+# VSCodeをターミナルから開けるように
+code () { VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $* }
+
+# PDF解析のpoppler用
+export DYLD_LIBRARY_PATH=/usr/local/opt/cairo/lib
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
